@@ -108,11 +108,10 @@ async function term(argv: string[]): Promise<void> {
         port.close();
         return;
       }
-      port.write(input);
     }
   });
   process.stdin.once('end', () => port.close());
-  process.stdin.resume();
+  process.stdin.pipe(port);
 
   await once(port, 'close');
 }
