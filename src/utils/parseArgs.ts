@@ -1,5 +1,5 @@
 import { ParsedArgs } from 'minimist';
-import cli from 'cli-ux';
+import { CliUx } from '@oclif/core';
 
 interface ParseArgFieldBase {
   short?: string;
@@ -68,7 +68,7 @@ function printHelp<T = ParseArgOptions>(options: T, usages?: string[]): void {
     });
 
     console.log('选项:');
-    cli.table(helps, {
+    CliUx.ux.table(helps, {
       keys: { minWidth: 30 },
       help: {},
     }, { 'no-header': true });
