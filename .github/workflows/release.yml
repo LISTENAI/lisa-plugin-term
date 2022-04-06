@@ -23,4 +23,4 @@ jobs:
           npm config set //registry-lpm.listenai.com/:username lpmadmin
           npm config set //registry-lpm.listenai.com/:email lpm.admin@listenai.com
           npm config set //registry-lpm.listenai.com/:always-auth true
-          npm dist-tag add @lisa-plugin/btest@${{ steps.get_version.outputs.version-without-v }} latest --registry=https://registry-lpm.listenai.com
+          npm dist-tag add @lisa-plugin/term@${{ steps.get_version.outputs.version-without-v }} latest --registry=https://registry-lpm.listenai.com
