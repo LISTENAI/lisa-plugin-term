@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/LISTENAI/lisa-plugin-term#readme",
   "dependencies": {
+    "chalk": "4",
     "cli-ux": "^5.6.4",
     "inquirer": "^8.2.0",
     "minimist": "^1.2.5",

@@ -2,6 +2,7 @@ import * as minimist from 'minimist';
 import { prompt } from 'inquirer';
 import { once } from 'events';
 import * as SerialPort from 'serialport';
+import * as chalk from 'chalk';
 
 import parseArgs from './utils/parseArgs';
 
@@ -94,6 +95,8 @@ async function term(argv: string[]): Promise<void> {
     stopBits: parseStopBits(args.stopbits ?? '') || 1,
   });
 
+  console.log(chalk.yellow(`-- 已打开串口 ${port.path}，波特率 ${port.baudRate} --`));
+  console.log(chalk.yellow(`-- 按 Ctrl + C 退出 --`));
   port.pipe(process.stdout);
 
   process.stdin.setRawMode(true);
