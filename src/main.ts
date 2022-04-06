@@ -1,7 +1,8 @@
 import * as minimist from 'minimist';
 import { prompt } from 'inquirer';
 import { once } from 'events';
-import * as SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
+import { PortInfo } from '@serialport/bindings-interface';
 import * as chalk from 'chalk';
 
 import parseArgs from './utils/parseArgs';
@@ -19,7 +20,7 @@ const EXAMPLE_PATH = (() => {
   }
 })();
 
-async function getFilteredPorts(): Promise<SerialPort.PortInfo[]> {
+async function getFilteredPorts(): Promise<PortInfo[]> {
   const ports = await SerialPort.list();
   return ports.filter(port => !PORT_BLACKLIST.includes(port.path));
 }
@@ -88,7 +89,8 @@ async function term(argv: string[]): Promise<void> {
   }
 
   const path = args.path || await askForPort();
-  const port = new SerialPort(path, {
+  const port = new SerialPort({
+    path: path,
     baudRate: parseInt(args.baud ?? '') || 115200,
     dataBits: parseDataBits(args.databits ?? '') || 8,
     parity: parseParity(args.parity ?? '') || 'none',
