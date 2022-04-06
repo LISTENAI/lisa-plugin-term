@@ -10,6 +10,14 @@ const PORT_BLACKLIST = [
   '/dev/tty.Bluetooth-Incoming-Port',
 ];
 
+const EXAMPLE_PATH = (() => {
+  switch (process.platform) {
+    case 'win32': return 'COM1';
+    case 'darwin': return '/dev/cu.usbserial-0001';
+    default: return '/dev/ttyUSB0';
+  }
+})();
+
 async function getFilteredPorts(): Promise<SerialPort.PortInfo[]> {
   const ports = await SerialPort.list();
   return ports.filter(port => !PORT_BLACKLIST.includes(port.path));
@@ -50,7 +58,7 @@ async function term(argv: string[]): Promise<void> {
   if (args['term-help']) {
     return printHelp([
       'term -l',
-      'term -p /dev/cu.usbserial-0001 -b 115200',
+      `term -p ${EXAMPLE_PATH} -b 115200`,
     ]);
   }
 
