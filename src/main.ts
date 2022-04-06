@@ -74,6 +74,9 @@ async function term(argv: string[]): Promise<void> {
     if (ports.length == 0) {
       throw new Error('未找到任何串口设备，请尝试使用 -p [path] 手动指定');
     }
+    if (ports.length == 1) {
+      return ports[0].path;
+    }
     const { path } = await prompt([{
       type: 'list',
       name: 'path',
