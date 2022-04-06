@@ -1,6 +1,6 @@
 {
   "name": "@lisa-plugin/term",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LISA Terminal plugin",
   "main": "./lib/main.js",
   "engines": {
