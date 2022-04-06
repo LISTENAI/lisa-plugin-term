@@ -1,32 +1,86 @@
 name: test
 
-on: [ push ]
+on: [push]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node: ['14', '16']
+    outputs:
+      tarball: ${{ steps.build.outputs.tarball }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+
+      - name: Build
+        id: build
+        run: npm run build && echo "::set-output name=tarball::$(npm pack)"
+
+      - name: Upload tarball
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.build.outputs.tarball }}
+          path: ${{ steps.build.outputs.tarball }}
+
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        node: ['14', '16']
+
+    steps:
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
 
-      - name: NPM config
+      - name: Download tarball
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ needs.build.outputs.tarball }}
+
+      - name: Install @listenai/lisa
+        run: npm install -g @listenai/lisa && lisa login --token ${{ secrets.LS_ACCESS_TOKEN }}
+
+      - name: Install @lisa-plugin/term
+        run: lisa install -g ${{ needs.build.outputs.tarball }}
+
+      - name: Test --list
+        run: lisa term --list
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+
+      - name: LPM publish (beta)
         run: |
           npm config set //registry-lpm.listenai.com/:_password ${{ secrets.LPM_ADMIN_TOKEN }}
           npm config set //registry-lpm.listenai.com/:username lpmadmin
           npm config set //registry-lpm.listenai.com/:email lpm.admin@listenai.com
           npm config set //registry-lpm.listenai.com/:always-auth true
-
-      - name: Install dependencies
-        run: npm install --registry=https://registry-lpm.listenai.com
-
-      - name: Build
-        run: npm run build
+          npm publish --registry=https://registry-lpm.listenai.com --tag=beta
