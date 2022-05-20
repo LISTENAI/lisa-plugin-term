@@ -97,6 +97,8 @@ async function term(argv: string[]): Promise<void> {
     stopBits: parseStopBits(args.stopbits ?? '') || 1,
   });
 
+  await once(port, 'open');
+
   console.log(chalk.yellow(`-- 已打开串口 ${port.path}，波特率 ${port.baudRate} --`));
   console.log(chalk.yellow(`-- 按 Ctrl + C 退出 --`));
   port.pipe(process.stdout);
