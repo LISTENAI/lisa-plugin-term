@@ -21,8 +21,12 @@ const EXAMPLE_PATH = (() => {
 })();
 
 async function getFilteredPorts(): Promise<PortInfo[]> {
-  const ports = await SerialPort.list();
-  return ports.filter(port => !PORT_BLACKLIST.includes(port.path));
+  let ports = await SerialPort.list();
+  ports = ports.filter(port => !PORT_BLACKLIST.includes(port.path));
+  if (process.platform == 'darwin') {
+    ports.forEach(port => port.path = port.path.replace(/^\/dev\/tty\./, '/dev/cu.'));
+  }
+  return ports;
 }
 
 function parseDataBits(input: string): 8 | 7 | 6 | 5 | undefined {
