@@ -12,7 +12,8 @@
     "prepublishOnly": "npm run build"
   },
   "lisa": {
-    "friendlyName": "term"
+    "friendlyName": "term",
+    "completion": "./lib/completion.js"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,8 @@
     "@types/inquirer": "^8.1.3",
     "@types/minimist": "^1.2.2",
     "@types/node": "^16.11.1",
+    "@types/tabtab": "^3.0.2",
+    "tabtab": "^3.0.2",
     "typescript": "^4.4.4"
   }
 }

@@ -20,7 +20,7 @@ const EXAMPLE_PATH = (() => {
   }
 })();
 
-async function getFilteredPorts(): Promise<PortInfo[]> {
+export async function getFilteredPorts(): Promise<PortInfo[]> {
   let ports = await SerialPort.list();
   ports = ports.filter(port => !PORT_BLACKLIST.includes(port.path));
   if (process.platform == 'darwin') {
@@ -51,16 +51,18 @@ function parseStopBits(input: string): 1 | 2 | undefined {
   if (stopBits == 2) return stopBits;
 }
 
+export const options = {
+  'list': { short: 'l', help: '列出本机所有串口路径' },
+  'path': { short: 'p', arg: 'path', help: '指定串口路径' },
+  'baud': { short: 'b', arg: 'rate', help: '波特率 (默认: 115200)' },
+  'databits': { arg: 'bits', help: '数据位 (默认: 8)' },
+  'parity': { arg: 'parity', help: '校验位 (默认: none)' },
+  'stopbits': { arg: 'bits', help: '停止位 (默认: 1)' },
+  'term-help': { short: 'h', help: '打印帮助' },
+};
+
 async function term(argv: string[]): Promise<void> {
-  const { args, printHelp } = parseArgs(minimist(argv), {
-    'list': { short: 'l', help: '列出本机所有串口路径' },
-    'path': { short: 'p', arg: 'path', help: '指定串口路径' },
-    'baud': { short: 'b', arg: 'rate', help: '波特率 (默认: 115200)' },
-    'databits': { arg: 'bits', help: '数据位 (默认: 8)' },
-    'parity': { arg: 'parity', help: '校验位 (默认: none)' },
-    'stopbits': { arg: 'bits', help: '停止位 (默认: 1)' },
-    'term-help': { short: 'h', help: '打印帮助' },
-  });
+  const { args, printHelp } = parseArgs(minimist(argv), options);
   if (args['term-help']) {
     return printHelp([
       'term -l',
