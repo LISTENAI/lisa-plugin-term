@@ -4,6 +4,7 @@ import { once } from 'events';
 import { SerialPort } from 'serialport';
 import { PortInfo } from '@serialport/bindings-interface';
 import * as chalk from 'chalk';
+import { promisify } from 'util';
 
 import parseArgs from './utils/parseArgs';
 
@@ -58,6 +59,7 @@ export const options = {
   'databits': { arg: 'bits', help: '数据位 (默认: 8)' },
   'parity': { arg: 'parity', help: '校验位 (默认: none)' },
   'stopbits': { arg: 'bits', help: '停止位 (默认: 1)' },
+  'reset': { short: 'r', help: '打开后自动复位设备 (NanoKit)' },
   'term-help': { short: 'h', help: '打印帮助' },
 };
 
@@ -103,11 +105,21 @@ async function term(argv: string[]): Promise<void> {
     stopBits: parseStopBits(args.stopbits ?? '') || 1,
   });
 
+  const set = promisify(port.set).bind(port);
+
   await once(port, 'open');
+
+  if (args.reset) {
+    await set({ rts: false, dtr: true });
+  }
 
   console.log(chalk.yellow(`-- 已打开串口 ${port.path}，波特率 ${port.baudRate} --`));
   console.log(chalk.yellow(`-- 按 Ctrl + C 退出 --`));
   port.pipe(process.stdout);
+
+  if (args.reset) {
+    await set({ rts: false, dtr: false });
+  }
 
   process.stdin.setRawMode(true);
   process.stdin.on('data', (input) => {
