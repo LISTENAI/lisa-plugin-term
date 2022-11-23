@@ -30,6 +30,7 @@ LISA Term Plugin [![test](https://github.com/LISTENAI/lisa-plugin-term/actions/w
      --databits <bits>         数据位 (默认: 8)
      --parity <parity>         校验位 (默认: none)
      --stopbits <bits>         停止位 (默认: 1)
+ -r, --reset                   打开后自动复位设备 (NanoKit)
  -h, --term-help               打印帮助
 ```
 
