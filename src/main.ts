@@ -60,6 +60,7 @@ export const options = {
   'parity': { arg: 'parity', help: '校验位 (默认: none)' },
   'stopbits': { arg: 'bits', help: '停止位 (默认: 1)' },
   'reset': { short: 'r', help: '打开后自动复位设备 (NanoKit)' },
+  'dump': { short: 'd', help: '以十六进制打印收到的数据' },
   'term-help': { short: 'h', help: '打印帮助' },
 };
 
@@ -115,7 +116,18 @@ async function term(argv: string[]): Promise<void> {
 
   console.log(chalk.yellow(`-- 已打开串口 ${port.path}，波特率 ${port.baudRate} --`));
   console.log(chalk.yellow(`-- 按 Ctrl + C 退出 --`));
-  port.pipe(process.stdout);
+
+  if (args.dump) {
+    port.on('data', (data: Buffer) => {
+      for (let i = 0; i < data.length; i += 32) {
+        const lead = chalk.gray(`0x${i.toString(16).padStart(4, '0')}:`);
+        const dump = data.slice(i, i + 32).toString('hex').replace(/(.{2})/g, ' $1');
+        console.log(`${lead}${dump}`);
+      }
+    });
+  } else {
+    port.pipe(process.stdout);
+  }
 
   if (args.reset) {
     await set({ rts: false, dtr: false });
