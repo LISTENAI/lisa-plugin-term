@@ -109,6 +109,7 @@ async function term(argv: string[]): Promise<void> {
   const set = promisify(port.set).bind(port);
 
   await once(port, 'open');
+  await set({ rts: false, dtr: false });
 
   if (args.reset) {
     await set({ rts: false, dtr: true });
